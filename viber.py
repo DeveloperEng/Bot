@@ -453,7 +453,7 @@ def proc1b68be2d5a9a4d06adb59b874e1673ea(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    ViberSendMessages(sender_id, TextMessage(text="Введите ваше ФИО"))
+    ViberSendMessages(sender_id, TextMessage(text="Введите идентификатор подписчика"))
     if not SaveState(sender_id, "b68be2d-5a9a-4d06-adb5-9b874e1673ea1", service_data_bot_need, data, carousel_id): #proc_function_expect_user1b68be2d5a9a4d06adb59b874e1673ea
         ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
@@ -470,8 +470,7 @@ def proc_function_expect_user1b68be2d5a9a4d06adb59b874e1673ea(sender_id, message
     if result_programm_select == "0":
         proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Выбор действия
     elif result_programm_select == "1":
-      # proc2b3f0bd4eef0409c9ffb14ffb0d21861(sender_id, message, data, service_data_bot_need, carousel_id) #Секретный код неверный
-        proc1b68be2d5a9a4d06adb59b874e1673ea(sender_id, message, data, service_data_bot_need, carousel_id) 
+        proc2b3f0bd4eef0409c9ffb14ffb0d21861(sender_id, message, data, service_data_bot_need, carousel_id) #Секретный код неверный
     elif result_programm_select == "error":
         proc1b68be2d5a9a4d06adb59b874e1673ea(sender_id, message, data, service_data_bot_need, carousel_id) #Ввод секретного кода
 
@@ -524,6 +523,26 @@ def proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_
         "Rows": 1,
         "ActionBody": "76456fc5-a5d3-4b54-81dc-b15c34787790",
         "Text": "Зарегистрировать обращение" })
+    buttons.append({
+        "Columns": 6,
+        "Rows": 1,
+        "ActionBody": "91d863c1-0ff0-456b-acb0-86818cac8a03",
+        "Text": "Внести уточнения" })
+    buttons.append({
+        "Columns": 6,
+        "Rows": 1,
+        "ActionBody": "5160f46d-71b8-466a-8b28-db1bf17d5392",
+        "Text": "Обращения для подтверждения" })
+    buttons.append({
+        "Columns": 6,
+        "Rows": 1,
+        "ActionBody": "cdab1713-d317-452b-bbdb-8a484d513051",
+        "Text": "Последние сообщения" })
+    buttons.append({
+        "Columns": 6,
+        "Rows": 1,
+        "ActionBody": "f6829c8b-eb46-4c61-8ab6-3bd31f6bc879",
+        "Text": "Получить статус" })
     ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "95761bb-67d8-455b-bf09-4e32d0e8dc4f0", service_data_bot_need, data, carousel_id): #proc_expect_user_button_click095761bb67d8455bbf094e32d0e8dc4f
         ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
