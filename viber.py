@@ -453,7 +453,7 @@ def proc1b68be2d5a9a4d06adb59b874e1673ea(sender_id, message, data, service_data_
         service_data_bot_need = {}
         carousel_id = ''
         data = {}
-    ViberSendMessages(sender_id, TextMessage(text="Введите идентификатор подписчика"))
+    ViberSendMessages(sender_id, TextMessage(text="Введите ваше ФИО"))
     if not SaveState(sender_id, "b68be2d-5a9a-4d06-adb5-9b874e1673ea1", service_data_bot_need, data, carousel_id): #proc_function_expect_user1b68be2d5a9a4d06adb59b874e1673ea
         ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
         GoToStateError(sender_id, message, GetIdErrorState(), {}, {}, "")
@@ -470,7 +470,8 @@ def proc_function_expect_user1b68be2d5a9a4d06adb59b874e1673ea(sender_id, message
     if result_programm_select == "0":
         proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_bot_need, carousel_id) #Выбор действия
     elif result_programm_select == "1":
-        proc2b3f0bd4eef0409c9ffb14ffb0d21861(sender_id, message, data, service_data_bot_need, carousel_id) #Секретный код неверный
+      # proc2b3f0bd4eef0409c9ffb14ffb0d21861(sender_id, message, data, service_data_bot_need, carousel_id) #Секретный код неверный
+        proc1b68be2d5a9a4d06adb59b874e1673ea(sender_id, message, data, service_data_bot_need, carousel_id) 
     elif result_programm_select == "error":
         proc1b68be2d5a9a4d06adb59b874e1673ea(sender_id, message, data, service_data_bot_need, carousel_id) #Ввод секретного кода
 
@@ -523,7 +524,6 @@ def proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_
         "Rows": 1,
         "ActionBody": "76456fc5-a5d3-4b54-81dc-b15c34787790",
         "Text": "Зарегистрировать обращение" })
-
     ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "95761bb-67d8-455b-bf09-4e32d0e8dc4f0", service_data_bot_need, data, carousel_id): #proc_expect_user_button_click095761bb67d8455bbf094e32d0e8dc4f
         ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
@@ -2603,20 +2603,20 @@ def IncomingGet():
 
 @app.route('/',  methods=['POST'])
 def incoming():
-   # random.seed()
-   # current_thread.update({'id': random.randint(1,1000)})
+    random.seed()
+    current_thread.update({'id': random.randint(1,1000)})
     if not viber.verify_signature(request.get_data(), request.headers.get('X-Viber-Content-Signature')):
         return Response(status=403)
-   # print("thread:" + GetCurrentThread() + " START")
+    print("thread:" + GetCurrentThread() + " START")
     viber_request = viber.parse_request(request.get_data())
 
     if isinstance(viber_request, ViberMessageRequest):
-     #   print("thread:" + GetCurrentThread() + "Новое сообщение от пользователя " + str(viber_request.timestamp) + " " + str(viber_request.message))
-     #   print("thread:" + GetCurrentThread() + "viber_request.timestamp:" + str(viber_request.timestamp))
+        print("thread:" + GetCurrentThread() + "Новое сообщение от пользователя " + str(viber_request.timestamp) + " " + str(viber_request.message))
+        print("thread:" + GetCurrentThread() + "viber_request.timestamp:" + str(viber_request.timestamp))
         sender_id = viber_request.sender.id
         message = viber_request.message
 
-      #  if SetFlagStartQuery(sender_id, viber_request.timestamp):
+        if SetFlagStartQuery(sender_id, viber_request.timestamp):
             try:
                 print("thread:" + GetCurrentThread() + " Current user blocked. Need Stop block on end thread")
                 is_registered_user = GetIsRegisteredUser(sender_id)
@@ -2632,7 +2632,7 @@ def incoming():
             return Response(status=200)
 
     elif isinstance(viber_request, ViberSubscribedRequest):
-       # ViberSendMessages(viber_request.sender.id, TextMessage(text="Вы зарегистрированы"))
+        ViberSendMessages(viber_request.sender.id, TextMessage(text="Вы зарегистрированы"))
     elif isinstance(viber_request, ViberFailedRequest):
         onFailedDeliveredMessage(viber_request._message_token, viber_request._user_id)
         print("thread:" + GetCurrentThread() + "НЕ Доставлено " + str(viber_request._message_token))
