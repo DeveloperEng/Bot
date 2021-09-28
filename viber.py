@@ -523,7 +523,26 @@ def proc095761bb67d8455bbf094e32d0e8dc4f(sender_id, message, data, service_data_
         "Rows": 1,
         "ActionBody": "76456fc5-a5d3-4b54-81dc-b15c34787790",
         "Text": "Зарегистрировать обращение" })
-
+    buttons.append({
+        "Columns": 6,
+        "Rows": 1,
+        "ActionBody": "91d863c1-0ff0-456b-acb0-86818cac8a03",
+        "Text": "Внести уточнения" })
+    buttons.append({
+        "Columns": 6,
+        "Rows": 1,
+        "ActionBody": "5160f46d-71b8-466a-8b28-db1bf17d5392",
+        "Text": "Обращения для подтверждения" })
+    buttons.append({
+        "Columns": 6,
+        "Rows": 1,
+        "ActionBody": "cdab1713-d317-452b-bbdb-8a484d513051",
+        "Text": "Последние сообщения" })
+    buttons.append({
+        "Columns": 6,
+        "Rows": 1,
+        "ActionBody": "f6829c8b-eb46-4c61-8ab6-3bd31f6bc879",
+        "Text": "Получить статус" })
     ViberSendMessages(sender_id, KeyboardMessage(min_api_version=4, keyboard={"InputFieldState": "hidden", "Type": "keyboard", "Buttons": buttons}))
     if not SaveState(sender_id, "95761bb-67d8-455b-bf09-4e32d0e8dc4f0", service_data_bot_need, data, carousel_id): #proc_expect_user_button_click095761bb67d8455bbf094e32d0e8dc4f
         ViberSendMessages(sender_id, TextMessage(text="ERROR SAVE STATE"))
@@ -2416,15 +2435,15 @@ def SetFlagStartQuery(sender_id, timestamp_message):
         conn.close()
 
 def RequestItilium(dict_data):
-    print("thread:" + GetCurrentThread() + "stack: RequestItilium")
+    #print("thread:" + GetCurrentThread() + "stack: RequestItilium")
     try:
        quote = "\""
        response = requests.post(address_api_itilium, data=json.dumps(dict_data).encode('utf-8'),
                             auth=(login_itilium, password_itilium))
        code = response.status_code
        description = response.text
-       print("thread:" + GetCurrentThread() + "  code: " + str(code))
-       print("thread:" + GetCurrentThread() + "  description: " + description)
+    #   print("thread:" + GetCurrentThread() + "  code: " + str(code))
+    #   print("thread:" + GetCurrentThread() + "  description: " + description)
        if (code == 200):
            return False, description, True
        else:
@@ -2484,34 +2503,34 @@ def GoToCurrentState(sender_id, message, is_registered_user):
     return
 
 def SetHooksIfNeed():
-    print("thread:" + GetCurrentThread() + "stack: SetHooksIfNeed")
+    #print("thread:" + GetCurrentThread() + "stack: SetHooksIfNeed")
     need_hook = False
     try:
-        need_drop = False
-        DATABASE_URL = os.environ['DATABASE_URL']
+      #  need_drop = False
+      #  DATABASE_URL = os.environ['DATABASE_URL']
         # Connect to an existing database
-        conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+       # conn = psycopg2.connect(DATABASE_URL, sslmode='require')
         # Open a cursor to perform database operations
-        cur = conn.cursor()
-        cur.execute("select * from information_schema.tables where table_name=%s", ('data_hooks',))
-        if(cur.rowcount == 0):
+      #  cur = conn.cursor()
+      #  cur.execute("select * from information_schema.tables where table_name=%s", ('data_hooks',))
+      #  if(cur.rowcount == 0):
             # Execute a command: this creates a new table
-            cur.execute("CREATE TABLE data_hooks (id serial PRIMARY KEY, state TEXT );")
+      #      cur.execute("CREATE TABLE data_hooks (id serial PRIMARY KEY, state TEXT );")
             need_hook = True
-        else:
-            cur.execute("SELECT state FROM data_hooks")
-            result_query = cur.fetchone()
-            if(result_query == None):
-                need_hook = True
-            elif not result_query[0] == "1":
-                need_hook = True
-                need_drop = True
-            else: #result_query[0] == "1":
-                need_hook = False
+      #  else:
+      #      cur.execute("SELECT state FROM data_hooks")
+      #      result_query = cur.fetchone()
+      #      if(result_query == None):
+      #          need_hook = True
+      #      elif not result_query[0] == "1":
+      #          need_hook = True
+      #          need_drop = True
+      #      else: #result_query[0] == "1":
+      #          need_hook = False
 
         if need_hook:
-            if need_drop:
-                cur.execute("DELETE FROM data_hooks");
+       #     if need_drop:
+       #         cur.execute("DELETE FROM data_hooks");
             viber = Api(BotConfiguration(
                 name='Itilium-bot',
                 avatar='http://site.com/avatar.jpg',
@@ -2520,14 +2539,14 @@ def SetHooksIfNeed():
             viber.unset_webhook()
             viber.set_webhook(request.url)
 
-            cur.execute("INSERT INTO data_hooks (state) VALUES (%s)",
-                  ("1",))
-        conn.commit()
+        #    cur.execute("INSERT INTO data_hooks (state) VALUES (%s)",
+         #         ("1",))
+       # conn.commit()
     except Exception as e:
-        return False, False, e
-    finally:
-        cur.close()
-        conn.close()
+        return False, False,e
+    #finally:
+    #    cur.close()
+    #    conn.close()
     return True, need_hook, ""
 
 app = Flask(__name__)
@@ -2603,97 +2622,60 @@ def IncomingGet():
 
 @app.route('/',  methods=['POST'])
 def incoming():
-   # random.seed()
-   # current_thread.update({'id': random.randint(1,1000)})
+  #  random.seed()
+  #  current_thread.update({'id': random.randint(1,1000)})
     if not viber.verify_signature(request.get_data(), request.headers.get('X-Viber-Content-Signature')):
         return Response(status=403)
-   # print("thread:" + GetCurrentThread() + " START")
+  #  print("thread:" + GetCurrentThread() + " START")
     viber_request = viber.parse_request(request.get_data())
 
     if isinstance(viber_request, ViberMessageRequest):
-     #   print("thread:" + GetCurrentThread() + "Новое сообщение от пользователя " + str(viber_request.timestamp) + " " + str(viber_request.message))
-     #   print("thread:" + GetCurrentThread() + "viber_request.timestamp:" + str(viber_request.timestamp))
+  #      print("thread:" + GetCurrentThread() + "Новое сообщение от пользователя " + str(viber_request.timestamp) + " " + str(viber_request.message))
+  #      print("thread:" + GetCurrentThread() + "viber_request.timestamp:" + str(viber_request.timestamp))
         sender_id = viber_request.sender.id
         message = viber_request.message
-       
-      #  if SetFlagStartQuery(sender_id, viber_request.timestamp):
+
+  #      if SetFlagStartQuery(sender_id, viber_request.timestamp):
             try:
-             is_error, text, state = RequestItilium({"data": {"action": "incoming" ,"sender": sender_id}})
-                if is_error:
-                  #  text_error = text
-                  #  ViberSendMessages(sender_id, TextMessage(text="Ошибка работы сети. Проверьте доступность сети:" + text_error))
-                    return False
-                else:
-                    if state:
-                        if str(text) == "0":
-                            return True
-                        else:
-                            return False
-                else:
-                    #    text_error = text
-                   #     ViberSendMessages(sender_id, TextMessage(text="Ошибка при проверке регистрации, проверьте доступность Основной базы:" + str(text_error)))
+                   is_error, text, state = RequestItilium({"data": {"action": "is_not_registered","sender": sender_id}})
+                   if is_error:
+                        #text_error = text
+                        #ViberSendMessages(sender_id, TextMessage(text="Ошибка работы сети. Проверьте доступность сети:" + text_error))
                         return False
-                
-##                print("thread:" + GetCurrentThread() + " Current user blocked. Need Stop block on end thread")
-##                is_registered_user = GetIsRegisteredUser(sender_id)
-##                GoToCurrentState(sender_id, message, is_registered_user)
-##                print("thread:" + GetCurrentThread() + " After GoToCurrentState")
+                    else:
+                        if state:
+                            if str(text) == "0":
+                                return True
+                            else:
+                                return False
+                        else:
+                            #text_error = text
+                            #ViberSendMessages(sender_id, TextMessage(text="Ошибка при проверке регистрации, проверьте доступность Основной базы:" + str(text_error)))
+                            return False
+   #             print("thread:" + GetCurrentThread() + " Current user blocked. Need Stop block on end thread")
+   #             is_registered_user = GetIsRegisteredUser(sender_id)
+   #             GoToCurrentState(sender_id, message, is_registered_user)
+   #             print("thread:" + GetCurrentThread() + " After GoToCurrentState")
             except :
-                print('Error getting data in Itilium')
-##            finally:
-##                print("thread:" + GetCurrentThread() + " FINALLY. SetFlagStopQuery")
-##                SetFlagStopQuery(sender_id)
-##      else:
-##            print("thread:" + GetCurrentThread() + "Ничего не делаем. Причина выше в логах")
-##            return Response(status=200)
+                print ("Error getting data Itilium")
+   #             print("thread:" + GetCurrentThread() + "Error:"+ e.args[0])
+    #        finally:
+   #             print("thread:" + GetCurrentThread() + " FINALLY. SetFlagStopQuery")
+   #             SetFlagStopQuery(sender_id)
+ #       else:
+ #           print("thread:" + GetCurrentThread() + "Ничего не делаем. Причина выше в логах")
+ #           return Response(status=200)
 
     elif isinstance(viber_request, ViberSubscribedRequest):
-       # ViberSendMessages(viber_request.sender.id, TextMessage(text="Вы зарегистрированы"))
-       try:
-             is_error, text, state = RequestItilium({"data": {"action": "register_user", "sender": sender_id}})
-                if is_error:
-                  #  text_error = text
-                  #  ViberSendMessages(sender_id, TextMessage(text="Ошибка работы сети. Проверьте доступность сети:" + text_error))
-                    return False
-                else:
-                    if state:
-                        if str(text) == "0":
-                            return True
-                        else:
-                            return False
-                else:
-                    #    text_error = text
-                   #     ViberSendMessages(sender_id, TextMessage(text="Ошибка при проверке регистрации, проверьте доступность Основной базы:" + str(text_error)))
-                        return False
+        ViberSendMessages(viber_request.sender.id, TextMessage(text="Вы зарегистрированы"))
     elif isinstance(viber_request, ViberFailedRequest):
-         try:
-             is_error, text, state = RequestItilium({"data": {"action": "faild_request", "sender": sender_id}})
-                if is_error:
-                  #  text_error = text
-                  #  ViberSendMessages(sender_id, TextMessage(text="Ошибка работы сети. Проверьте доступность сети:" + text_error))
-                    return False
-                else:
-                    if state:
-                        if str(text) == "0":
-                            return True
-                        else:
-                            return False
-                else:
-                    #    text_error = text
-                   #     ViberSendMessages(sender_id, TextMessage(text="Ошибка при проверке регистрации, проверьте доступность Основной базы:" + str(text_error)))
-                        return False
-##    elif isinstance(viber_request, ViberDeliveredRequest):
-##        onDeliveredMessage(viber_request._message_token, viber_request._user_id, viber_request.timestamp)
-##        print("thread:" + GetCurrentThread() + "Доставлено " + str(viber_request._message_token))
-##        print("thread:" + GetCurrentThread() + "Доставлено viber_request.timestamp:" + str(viber_request.timestamp))
-##    elif isinstance(viber_request, ViberConversationStartedRequest) :
-        
-                
-##                print("thread:" + GetCurrentThread() + " Current user blocked. Need Stop block on end thread")
-##                is_registered_user = GetIsRegisteredUser(sender_id)
-##                GoToCurrentState(sender_id, message, is_registered_user)
-##                print("thread:" + GetCurrentThread() + " After GoToCurrentState")
-            except :
-                print('Error getting data in Itilium')
+        onFailedDeliveredMessage(viber_request._message_token, viber_request._user_id)
+        print("thread:" + GetCurrentThread() + "НЕ Доставлено " + str(viber_request._message_token))
+    elif isinstance(viber_request, ViberDeliveredRequest):
+        onDeliveredMessage(viber_request._message_token, viber_request._user_id, viber_request.timestamp)
+        print("thread:" + GetCurrentThread() + "Доставлено " + str(viber_request._message_token))
+        print("thread:" + GetCurrentThread() + "Доставлено viber_request.timestamp:" + str(viber_request.timestamp))
+    elif isinstance(viber_request, ViberConversationStartedRequest) :
+        ViberSendMessages(viber_request.sender.id, [TextMessage(text="Добрый день. Вы подписались на бота Итилиум")])
 
     return Response(status=200)
